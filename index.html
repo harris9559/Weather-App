@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            padding: 50px;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: inline-block;
+            backdrop-filter: blur(15px);
+            max-width: 400px;
+        }
+        h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        input {
+            padding: 12px;
+            width: 80%;
+            border: none;
+            border-radius: 25px;
+            outline: none;
+            text-align: center;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            background: #ff9800;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #e68900;
+        }
+        #result, #forecast {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        .healthy { color: green; }
+        .moderate { color: orange; }
+        .unhealthy { color: red; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🌤️ Weather App</h2>
+        <input type="text" id="location" placeholder="Enter location">
+        <button onclick="getWeather()">Get Weather</button>
+        <p id="result"></p>
+        <div id="forecast"></div>
+    </div>
+
+    <script>
+        function getWeather() {
+            const location = document.getElementById('location').value;
+            const apiKey = '461c87bc130947acba794213252403';
+            const url = `http://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${location}&aqi=yes&days=5`;
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    let aqi = data.current.air_quality.pm2_5;
+                    let healthRisk = "";
+                    let riskClass = "";
+                    
+                    if (aqi <= 50) {
+                        healthRisk = "Good";
+                        riskClass = "healthy";
+                    } else if (aqi <= 100) {
+                        healthRisk = "Moderate";
+                        riskClass = "moderate";
+                    } else {
+                        healthRisk = "Unhealthy";
+                        riskClass = "unhealthy";
+                    }
+                    
+                    document.getElementById('result').innerHTML = `
+                        📍 Location: <strong>${data.location.name}, ${data.location.country}</strong><br>
+                        🌡️ Temperature: <strong>${data.current.temp_c}°C</strong><br>
+                        🌥️ Condition: <strong>${data.current.condition.text}</strong><br>
+                        🌫️ AQI: <strong>${aqi}</strong><br>
+                        🚦 Health Risk: <strong class="${riskClass}">${healthRisk}</strong>
+                    `;
+                    
+                    let forecastHtml = "<h3>🌤️ 5-Day Forecast</h3>";
+                    data.forecast.forecastday.forEach(day => {
+                        forecastHtml += `
+                            <p>
+                                📅 ${day.date} - 🌡️ ${day.day.avgtemp_c}°C - 🌥️ ${day.day.condition.text}
+                            </p>
+                        `;
+                    });
+                    document.getElementById('forecast').innerHTML = forecastHtml;
+                })
+                .catch(error => {
+                    document.getElementById('result').innerHTML = '❌ Error fetching weather data';
+                });
+        }
+    </script>
+</body>
+</html>
