@@ -1,0 +1,1 @@
+This is a clean and contemporary weather application that gives real-time weather information, a 5-day forecast, and air quality index (AQI) reports. Users can input a location to receive the current temperature, weather conditions, and a health risk indicator based on air quality. The application retrieves data from the WeatherAP
